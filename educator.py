@@ -195,11 +195,10 @@ Remember, your health is super important, and it's okay to take care of yourself
 
 Keep being awesome, Zoe!
 """
-    asthma_text = markdown_to_plaintext(markdown_text)
-    if st.button("🔊 Listen", key="asthma_audio"):
-        with st.spinner("Please wait while audio loads. This may take a minute..."):
-            audio_data = generate_tts_audio(asthma_text)
-            st.audio(audio_data, format="audio/mp3")
+    audio_path = "tts_audio/asthma_audio.mp3"
+    with open(audio_path, "rb") as audio_file:
+        audio_bytes = audio_file.read()
+    st.audio(audio_bytes, format="audio/mp3")
     st.markdown(markdown_text)
 
 with st.expander('Diabetes'):
@@ -270,11 +269,10 @@ Let's work together to create a personalized plan that incorporates your love fo
 
 You got this, Daniel!              
 """
-    diabetes_text = markdown_to_plaintext(markdown_text)
-    if st.button("🔊 Listen", key="diabetes_audio"):
-        with st.spinner("Please wait while audio loads. This may take a minute..."):
-            audio_data = generate_tts_audio(diabetes_text)
-            st.audio(audio_data, format="audio/mp3")
+    audio_path = "tts_audio/diabetes_audio.mp3"
+    with open(audio_path, "rb") as audio_file:
+        audio_bytes = audio_file.read()
+    st.audio(audio_bytes, format="audio/mp3")
     st.markdown(markdown_text)
 
 with st.expander('High Blood Pressure'):
@@ -316,9 +314,8 @@ Remember, Lillian, you're not alone! Many people with hypertension lead active, 
 
 How does that sound? Do you have any questions or concerns?        
 """
-    hypertension_text = markdown_to_plaintext(markdown_text)
-    if st.button("🔊 Listen", key="hypertension_audio"):
-        with st.spinner("Please wait while audio loads. This may take a minute..."):
-            audio_data = generate_tts_audio(hypertension_text)
-            st.audio(audio_data, format="audio/mp3")
+    audio_path = "tts_audio/hypertension_audio.mp3"
+    with open(audio_path, "rb") as audio_file:
+        audio_bytes = audio_file.read()
+    st.audio(audio_bytes, format="audio/mp3")
     st.markdown(markdown_text)
