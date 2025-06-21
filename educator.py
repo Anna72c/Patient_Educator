@@ -33,6 +33,20 @@ default_values = {
     "tts_toggle": False
 }
 
+################################################################################################################################
+
+# Initializes "generation_successful" to False
+if "generation_successful" not in st.session_state:
+    st.session_state["generation_successful"] = False
+# Initializes "content" to an empty string
+if "content" not in st.session_state:
+    st.session_state["content"] = ""
+# Initializes "rewritten" to an empty string.
+if "rewritten" not in st.session_state:
+    st.session_state["rewritten"] = ""
+
+################################################################################################################################
+
 # Checks if session state keys exist, if not, initializes them with default values
 for key, value in default_values.items():
     if key not in st.session_state:
@@ -127,29 +141,66 @@ if st.button("Generate"):
             try:
                 generation = ollama.generate(model='llama3', prompt=user_prompt)
                 # Only the response part of the output, no metadata
-                content = generation['response']
-                generation_successful = True
-                if st.button("Clear Response"):
-                    st.rerun()
+                st.session_state["content"] = generation['response']
+                st.session_state["generation_successful"] = True
             except Exception as e:
                 st.error(f"An error occurred while generating content: {str(e)}")
                 generation_successful = False
-        if generation_successful:
-            # If text-to-speech toggle is on, generate audio and display content, else just display content
-            if tts_toggle:
-                with st.spinner("Please wait while audio generates. This may take a minute..."):
-                    # creates new temp audio file in memory
-                    sound_file = BytesIO()
-                    plain = markdown_to_plaintext(content)
-                    # creates a gTTS object with ollama output as text and english as language
-                    tts = gTTS(plain, lang='en')
-                    # puts the generated text to temp file
-                    tts.write_to_fp(sound_file)
-                    # streams temp file to streamlit ui for playing
-                    st.audio(sound_file)
-                    st.markdown(content)
+        
+################################################################################################################################
+
+if st.session_state["generation_successful"]:
+    # ------------
+    content = st.session_state["content"]
+    # If text-to-speech toggle is on, generate audio and display content, else just display content
+    if tts_toggle:
+        with st.spinner("Please wait while audio generates. This may take a minute..."):
+            # creates new temp audio file in memory
+            sound_file = BytesIO()
+            plain = markdown_to_plaintext(content)
+            # creates a gTTS object with ollama output as text and english as language
+            tts = gTTS(plain, lang='en')
+            # puts the generated text to temp file
+            tts.write_to_fp(sound_file)
+            # streams temp file to streamlit ui for playing
+            st.audio(sound_file)
+            st.markdown(content)
+    else:
+        st.markdown(content)
+    if st.button("Clear Response"):
+        st.rerun()
+
+if st.session_state["generation_successful"]:
+    # --- 🎯 Rewrite Options ---
+    st.markdown("### Want to change the tone or length?")
+
+    # Selectbox for rewrite style
+    style = st.selectbox(
+        "Choose rewrite style:",
+        ["Shorter", "Simpler", "Friendlier", "More Detailed", "Bullet Points", "Professional Tone"]
+    )
+
+    # Rewrite button
+    if st.button("Rewrite Explanation"):
+        with st.spinner("Rewriting explanation..."):
+            # Create a prompt based on selected style
+            if style == "Bullet Points":
+                rewrite_prompt = f"Rewrite the following explanation as clear bullet points:\n\n{content}"
             else:
-                st.markdown(content)
+                rewrite_prompt = f"Rewrite the following explanation to be {style.lower()}:\n\n{content}"
+
+            try:
+                result = ollama.generate(model='llama3', prompt=rewrite_prompt)
+                st.session_state["rewritten"] = result["response"]
+            except Exception as e:
+                st.error(f"An error occurred during rewriting: {str(e)}")
+
+    # Show rewritten explanation if available
+    if st.session_state["rewritten"]:
+        st.markdown("### Rewritten Explanation")
+        st.markdown(st.session_state["rewritten"])
+
+################################################################################################################################
 
 # ------------------------------------------------------------------------------- Response Examples ------------------------------------------------------------------------------------
 
