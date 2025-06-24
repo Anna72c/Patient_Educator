@@ -96,13 +96,6 @@ st.write("Please fill in the information below:")
 # Creates input fields for patient details and condition selection
 name = st.text_input("Enter the patient’s name:", key="name")
 age = st.text_input("Enter the patient’s age:", key="age")
-if age != "":
-    st.session_state["age_touched"] = True
-if st.session_state["age_touched"]:
-    try:
-        int_age = int(age)
-    except ValueError:
-        st.error("Please enter a valid number for age.")
 condition = st.selectbox(
     "Choose a condition:",
     ["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer"],
@@ -127,10 +120,7 @@ if st.button("Clear Inputs"):
 user_prompt = None
 
 # Combines all user inputs into a single prompt
-if int_age <= 5:
-    # Creates a prompt that is guided towards the caregiver of the patient if they are 5 or under
-    user_prompt = f"You are talking to the caregiver of {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be supportive and give advice for caring for the child's condition."
-elif personal_toggle:
+if personal_toggle:
     # Creates a prompt that includes personal details if the toggle is on
     user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive."
 else:
