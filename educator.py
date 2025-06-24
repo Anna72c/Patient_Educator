@@ -12,6 +12,8 @@ import re
 from gtts import gTTS
 from io import BytesIO
 
+int_age = 0
+
 # Cache the audio generation by text (only re-run if the text changes)
 @st.cache_resource(show_spinner=False)
 def generate_tts_audio(text):
@@ -32,6 +34,9 @@ default_values = {
     "personal_toggle": False,
     "tts_toggle": False
 }
+
+if "age_touched" not in st.session_state:
+    st.session_state["age_touched"] = False
 
 # Session state initialization for content generation variables
 # Initializes "generation_successful" to False
@@ -90,7 +95,14 @@ st.write("Please fill in the information below:")
 
 # Creates input fields for patient details and condition selection
 name = st.text_input("Enter the patient’s name:", key="name")
-age = int(st.text_input("Enter the patient’s age:", key="age"))
+age = st.text_input("Enter the patient’s age:", key="age")
+if age != "":
+    st.session_state["age_touched"] = True
+if st.session_state["age_touched"]:
+    try:
+        int_age = int(age)
+    except ValueError:
+        st.error("Please enter a valid number for age.")
 condition = st.selectbox(
     "Choose a condition:",
     ["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer"],
@@ -103,6 +115,8 @@ personal_toggle = st.checkbox("Toggle personal details", key="personal_toggle")
 # If the personal details toggle is on, show additional input fields for interests, life details, and concerns
 if personal_toggle:
     interest = st.text_input("Enter one of the patient's interests (eg. sports, gardening, fashion):", key="interest")
+    life_detail = st.text_input("Enter a detail of the patient's life (eg. has children, works in an office):", key="life_detail")
+    concern = st.text_input("Enter the patient's concern (eg. worried about..., curious about...):", key="concern")
 
 tts_toggle = st.checkbox("Toggle text-to-speech", key="tts_toggle")
 
@@ -110,9 +124,11 @@ tts_toggle = st.checkbox("Toggle text-to-speech", key="tts_toggle")
 if st.button("Clear Inputs"):
     clear_inputs()
 
+user_prompt = None
+
 # Combines all user inputs into a single prompt
-if age <= 5:
-    #------------------
+if int_age <= 5:
+    # Creates a prompt that is guided towards the caregiver of the patient if they are 5 or under
     user_prompt = f"You are talking to the caregiver of {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be supportive and give advice for caring for the child's condition."
 elif personal_toggle:
     # Creates a prompt that includes personal details if the toggle is on
