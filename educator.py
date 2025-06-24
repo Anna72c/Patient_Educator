@@ -33,8 +33,7 @@ default_values = {
     "tts_toggle": False
 }
 
-################################################################################################################################
-
+# Session state initialization for content generation variables
 # Initializes "generation_successful" to False
 if "generation_successful" not in st.session_state:
     st.session_state["generation_successful"] = False
@@ -44,8 +43,8 @@ if "content" not in st.session_state:
 # Initializes "rewritten" to an empty string.
 if "rewritten" not in st.session_state:
     st.session_state["rewritten"] = ""
-
-################################################################################################################################
+if "rewrite_successful" not in st.session_state:
+    st.session_state["rewrite_successful"] = False
 
 # Checks if session state keys exist, if not, initializes them with default values
 for key, value in default_values.items():
@@ -56,7 +55,14 @@ for key, value in default_values.items():
 def clear_inputs():
     for key, value in default_values.items():
         if key in st.session_state:
-            del st.session_state[key]  # ✅ Remove instead of assigning
+            del st.session_state[key]  # Remove instead of assigning
+    st.rerun()
+
+def clear_response():
+    if "generation_successful" in st.session_state:
+        del st.session_state["generation_successful"]  # Remove instead of assigning
+    if "rewrite_successful" in st.session_state:
+        del st.session_state["rewrite_successful"]  # Remove instead of assigning
     st.rerun()
 
 # Converts markdown text (text w/ formatting done automatically by Ollama) to plain text
@@ -76,12 +82,6 @@ def markdown_to_plaintext(markdown_text):
     text = re.sub(r'\n{2,}', '\n', text)
     return text.strip()
 
-# Validates input to ensure it contains only letters, numbers, and spaces
-def control_input(input):
-    if not re.match("^[a-zA-Z0-9 ]*$", input):
-        st.error("Please use only letters, numbers, and spaces.")
-
-
 # ------------------------------------------------------------------------------- Input and AI Generation -------------------------------------------------------------------------------
 
 st.title("Patient Education Generator")
@@ -90,9 +90,7 @@ st.write("Please fill in the information below:")
 
 # Creates input fields for patient details and condition selection
 name = st.text_input("Enter the patient’s name:", key="name")
-control_input(name)
-age = st.text_input("Enter the patient’s age:", key="age")
-control_input(age)
+age = int(st.text_input("Enter the patient’s age:", key="age"))
 condition = st.selectbox(
     "Choose a condition:",
     ["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer"],
@@ -105,11 +103,6 @@ personal_toggle = st.checkbox("Toggle personal details", key="personal_toggle")
 # If the personal details toggle is on, show additional input fields for interests, life details, and concerns
 if personal_toggle:
     interest = st.text_input("Enter one of the patient's interests (eg. sports, gardening, fashion):", key="interest")
-    control_input(interest)
-    life_detail = st.text_input("Enter a detail of the patient's life (eg. has children, works in an office):", key="life_detail")
-    control_input(life_detail)
-    concern = st.text_input("Enter the patient's concern (eg. worried about..., curious about...):", key="concern")
-    control_input(concern)
 
 tts_toggle = st.checkbox("Toggle text-to-speech", key="tts_toggle")
 
@@ -118,12 +111,15 @@ if st.button("Clear Inputs"):
     clear_inputs()
 
 # Combines all user inputs into a single prompt
-if personal_toggle:
+if age <= 5:
+    #------------------
+    user_prompt = f"You are talking to the caregiver of {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be supportive and give advice for caring for the child's condition."
+elif personal_toggle:
     # Creates a prompt that includes personal details if the toggle is on
-    user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive."
+    user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive."
 else:
     # Creates a prompt without personal details if the toggle is off
-    user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
+    user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
 
 # Generates patient education content when button is pressed
 if st.button("Generate"):
@@ -146,11 +142,9 @@ if st.button("Generate"):
             except Exception as e:
                 st.error(f"An error occurred while generating content: {str(e)}")
                 generation_successful = False
-        
-################################################################################################################################
 
 if st.session_state["generation_successful"]:
-    # ------------
+    # ------------ makes easier for code
     content = st.session_state["content"]
     # If text-to-speech toggle is on, generate audio and display content, else just display content
     if tts_toggle:
@@ -167,12 +161,16 @@ if st.session_state["generation_successful"]:
             st.markdown(content)
     else:
         st.markdown(content)
+
+    # --------------------------ai generated warning
+    st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
+    
+    # ---------------------------clear generated response
     if st.button("Clear Response"):
-        st.rerun()
+        clear_response()
 
 if st.session_state["generation_successful"]:
-    # --- 🎯 Rewrite Options ---
-    st.markdown("### Want to change the tone or length?")
+    st.subheader("Want to change the tone or length?")
 
     # Selectbox for rewrite style
     style = st.selectbox(
@@ -182,31 +180,46 @@ if st.session_state["generation_successful"]:
 
     # Rewrite button
     if st.button("Rewrite Explanation"):
+        st.session_state["rewrite_successful"] = False
+
         with st.spinner("Rewriting explanation..."):
             # Create a prompt based on selected style
             if style == "Bullet Points":
                 rewrite_prompt = f"Rewrite the following explanation as clear bullet points:\n\n{content}"
             else:
                 rewrite_prompt = f"Rewrite the following explanation to be {style.lower()}:\n\n{content}"
-
             try:
                 result = ollama.generate(model='llama3', prompt=rewrite_prompt)
                 st.session_state["rewritten"] = result["response"]
+                st.session_state["rewrite_successful"] = True
             except Exception as e:
                 st.error(f"An error occurred during rewriting: {str(e)}")
 
-    # Show rewritten explanation if available
-    if st.session_state["rewritten"]:
-        st.markdown("### Rewritten Explanation")
+    if st.session_state["rewrite_successful"]:
+        if st.button("Play Audio"):
+            with st.spinner("Please wait while audio generates. This may take a minute..."):
+                # creates new temp audio file in memory
+                sound_file = BytesIO()
+                plain = markdown_to_plaintext(st.session_state["rewritten"])
+                # creates a gTTS object with ollama output as text and english as language
+                tts = gTTS(plain, lang='en')
+                # puts the generated text to temp file
+                tts.write_to_fp(sound_file)
+                # streams temp file to streamlit ui for playing
+                st.audio(sound_file)
         st.markdown(st.session_state["rewritten"])
 
-################################################################################################################################
+        # --------------------------ai generated warning
+        st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
 
 # ------------------------------------------------------------------------------- Response Examples ------------------------------------------------------------------------------------
 
-st.header("Examples:")
+st.text("")
+st.subheader("Examples:")
 
-with st.expander('Asthma'):
+st.markdown("These are sample AI-generated explanations for different patients. They show how the AI can personalize explanations based on age, lifestyle, and health needs.")
+
+with st.expander('**Asthma**'):
     st.markdown("**Prompt:**")
     st.markdown("You are talking to Zoe, a 12 year-old who was diagnosed with Asthma. They are interested in playing the flute. They recently joined their school band and are worried that asthma attacks will stop them from performing. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
     st.markdown("**Response:**")
@@ -225,7 +238,7 @@ with st.expander('Asthma'):
     # Display text
     st.markdown(explanation)
 
-with st.expander('Diabetes'):
+with st.expander('**Diabetes**'):
     st.markdown("**Prompt:**")
     st.markdown("You are talking to Daniel, a 38 year-old who was diagnosed with Type 2 Diabetes. They are interested in cooking and trying new foods. They were recently told to change their eating habits and feel overwhelmed and unsure what they can eat now. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
     st.markdown("**Response:**")
@@ -244,7 +257,7 @@ with st.expander('Diabetes'):
     # Display text
     st.markdown(explanation)
 
-with st.expander('High Blood Pressure'):
+with st.expander('**High Blood Pressure**'):
     st.markdown("**Prompt:**")
     st.markdown("You are talking to Lillian, a 64 year-old who was diagnosed with High Blood Pressure. They are interested in playing with their grandchildren. They take their grandchildren to the park often and are worried that their condition could make them too tired or sick to keep up with them. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
     st.markdown("**Response:**")
