@@ -43,6 +43,8 @@ if "age_touched" not in st.session_state:
 # Initializes "generation_successful" to False
 if "generation_successful" not in st.session_state:
     st.session_state["generation_successful"] = False
+if "audio_successful" in st.session_state:
+    st.session_state["audio_successful"] = False  
 # Initializes "content" to an empty string
 if "content" not in st.session_state:
     st.session_state["content"] = ""
@@ -67,6 +69,8 @@ def clear_inputs():
 def clear_response():
     if "generation_successful" in st.session_state:
         del st.session_state["generation_successful"]  # Remove instead of assigning
+    if "audio_successful" in st.session_state:
+        del st.session_state["audio_successful"]  # Remove instead of assigning
     if "rewrite_successful" in st.session_state:
         del st.session_state["rewrite_successful"]  # Remove instead of assigning
     st.rerun()
@@ -161,7 +165,7 @@ if st.session_state["generation_successful"]:
     # ------------ makes easier for code
     content = st.session_state["content"]
     # If text-to-speech toggle is on, generate audio and display content, else just display content
-    if tts_toggle:
+    if tts_toggle and not st.session_state["audio_successful"]:
         with st.spinner("Please wait while audio generates. This may take a minute..."):
             # creates new temp audio file in memory
             sound_file = BytesIO()
@@ -172,6 +176,7 @@ if st.session_state["generation_successful"]:
             tts.write_to_fp(sound_file)
             # streams temp file to streamlit ui for playing
             st.audio(sound_file)
+            st.session_state["audio_successful"] = True
             st.markdown(content)
     else:
         st.markdown(content)
