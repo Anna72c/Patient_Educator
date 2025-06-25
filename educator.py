@@ -43,7 +43,7 @@ if "age_touched" not in st.session_state:
 # Initializes "generation_successful" to False
 if "generation_successful" not in st.session_state:
     st.session_state["generation_successful"] = False
-if "audio_successful" in st.session_state:
+if "audio_successful" not in st.session_state:
     st.session_state["audio_successful"] = False  
 # Initializes "content" to an empty string
 if "content" not in st.session_state:
