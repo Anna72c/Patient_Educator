@@ -7,12 +7,13 @@
 
 # Imports necessary libraries
 import streamlit as st
-import ollama
+import openai
 import re
 from gtts import gTTS
 from io import BytesIO
 
-int_age = 0
+openai.api_key = st.secrets["groq_api_key"]
+openai.api_base = "https://api.groq.com/openai/v1"
 
 # Cache the audio generation by text (only re-run if the text changes)
 @st.cache_resource(show_spinner=False)
@@ -87,6 +88,15 @@ def markdown_to_plaintext(markdown_text):
     text = re.sub(r'\n{2,}', '\n', text)
     return text.strip()
 
+def generate(prompt):
+    response = openai.ChatCompletion.create(
+        model="llama3-8b-8192",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response.choices[0].message.content.strip()
+
 # ------------------------------------------------------------------------------- Input and AI Generation -------------------------------------------------------------------------------
 
 st.title("Patient Education Generator")
@@ -141,9 +151,7 @@ if st.button("Generate"):
         with st.spinner("Please wait while content generates. This may take a minute..."):
             # In case of an error with Ollama, it will display an error message
             try:
-                generation = ollama.generate(model='llama3', prompt=user_prompt)
-                # Only the response part of the output, no metadata
-                st.session_state["content"] = generation['response']
+                st.session_state["content"] = generate(user_prompt)
                 st.session_state["generation_successful"] = True
             except Exception as e:
                 st.error(f"An error occurred while generating content: {str(e)}")
@@ -195,8 +203,7 @@ if st.session_state["generation_successful"]:
             else:
                 rewrite_prompt = f"Rewrite the following explanation to be {style.lower()}:\n\n{content}"
             try:
-                result = ollama.generate(model='llama3', prompt=rewrite_prompt)
-                st.session_state["rewritten"] = result["response"]
+                st.session_state["rewritten"] = generate(rewrite_prompt)
                 st.session_state["rewrite_successful"] = True
             except Exception as e:
                 st.error(f"An error occurred during rewriting: {str(e)}")
