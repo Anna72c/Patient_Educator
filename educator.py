@@ -7,13 +7,13 @@
 
 # Imports necessary libraries
 import streamlit as st
-import openai
+from groq import Groq
 import re
 from gtts import gTTS
 from io import BytesIO
 
-openai.api_key = st.secrets["groq_api_key"]
-openai.api_base = "https://api.groq.com/openai/v1"
+# For local testing (use environment variable) OR Streamlit secrets
+client = Groq(api_key=st.secrets["groq_api_key"])  # Use st.secrets for deployment
 
 # Cache the audio generation by text (only re-run if the text changes)
 @st.cache_resource(show_spinner=False)
@@ -89,13 +89,13 @@ def markdown_to_plaintext(markdown_text):
     return text.strip()
 
 def generate(prompt):
-    response = openai.ChatCompletion.create(
-        model="llama3-8b-8192",
+    chat_completion = client.chat.completions.create(
+        model="llama3-8b-8192",  # Or "llama3-70b-4096" or the newer "llama-3.3-70b-versatile"
         messages=[
             {"role": "user", "content": prompt}
         ]
     )
-    return response.choices[0].message.content.strip()
+    return chat_completion.choices[0].message.content.strip()
 
 # ------------------------------------------------------------------------------- Input and AI Generation -------------------------------------------------------------------------------
 
