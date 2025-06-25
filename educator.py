@@ -161,7 +161,7 @@ if st.button("Generate"):
                 st.error(f"An error occurred while generating content: {str(e)}")
                 generation_successful = False
 
-if st.session_state["generation_successful"]:
+if st.session_state.get("generation_successful") and st.session_state.get("content"):
     # ------------ makes easier for code
     content = st.session_state["content"]
     # If text-to-speech toggle is on, generate audio and display content, else just display content
