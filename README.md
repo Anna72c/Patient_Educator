@@ -41,31 +41,24 @@ The tool helps patients understand their diagnoses by adjusting explanations to 
    ```bash
    streamlit run app.py
 
-<!--    
-📁 Project Structure
-bash
-Copy
-Edit
-├── app.py                # Main Streamlit application
-├── example_text/         # Example AI explanations (Markdown)
-│   ├── asthma_text.md
-│   ├── diabetes_text.md
-│   └── hypertension_text.md
-├── tts_audio/            # Pre-generated audio files
-│   ├── asthma_audio.mp3
-│   ├── diabetes_audio.mp3
-│   └── hypertension_audio.mp3
-└── .streamlit/
-    └── secrets.toml      # API key storage
-📌 Future Ideas
-More conditions and audio languages
+## Project Structure
+- app.py                # Main Streamlit application
+- example_text          # Example AI explanations (Markdown)
+  - asthma_text.md
+  - diabetes_text.md
+  - hypertension_text.md
+- tts_audio             # Pre-generated audio files
+  - asthma_audio.mp3
+  - diabetes_audio.mp3
+  - hypertension_audio.mp3
+- .streamlit
+  - secrets.toml        # API key storage
 
-User feedback collection
-
-PDF download button
-
-Caregiver mode toggle
--->
+## Future Ideas
+- More conditions and audio languages
+- User feedback collection
+- PDF download button
+- Caregiver mode toggle
 
 ## Made By
 **Anna Hoen**
