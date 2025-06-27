@@ -69,5 +69,7 @@ Caregiver mode toggle
 
 ## Made By
 **Anna Hoen**
+
 Mentor: Neelima
+
 Project: SciEncephalon Summer 2025 Internship – *Patient Education Generator*
