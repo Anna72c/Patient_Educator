@@ -23,6 +23,11 @@ The tool helps patients understand their diagnoses by adjusting explanations to 
 - **Languages**: Python, Markdown
 - **Other tools**: VS Code, GitHub, ChatGPT
 
+## Try It Online
+Check out the live demo here: [Patient Education Generator](https://anna72c-patient-educator.streamlit.app/)
+
+No installation or setup needed — just open the app and try it!
+
 ## How to Run Locally
 1. Clone the repository:
    ```bash
@@ -33,29 +38,33 @@ The tool helps patients understand their diagnoses by adjusting explanations to 
    ```bash
    pip install -r requirements.txt
    
-3. Add your Groq API key to .streamlit/secrets.toml:
-   ```toml
-   groq_api_key = "your_api_key_here"
+3. Get a free Groq API key:
+   - Go to [https://console.groq.com/keys](https://console.groq.com/keys)
+   - Create a key and copy it
 
-4. Run the app:
+4. Create a `.streamlit` folder and add a `secrets.toml` file with:
+   ```toml
+   groq_api_key = "your_key_here"
+
+5. Run the app:
    ```bash
-   streamlit run app.py
+   streamlit run educator.py
 
 ## Project Structure
-- app.py                # Main Streamlit application
-- example_text          # Example AI explanations (Markdown)
+- example_text          (Example AI explanations)
   - asthma_text.md
   - diabetes_text.md
   - hypertension_text.md
-- tts_audio             # Pre-generated audio files
+- tts_audio             (Pre-generated audio files)
   - asthma_audio.mp3
   - diabetes_audio.mp3
   - hypertension_audio.mp3
-- .streamlit
-  - secrets.toml        # API key storage
+- README.md             (This file)
+- educator.py           (Main Streamlit application)
+- requirements.txt      (Required dependencies)
 
 ## Future Ideas
-- More conditions and audio languages
+- More conditions
 - User feedback collection
 - PDF download button
 - Caregiver mode toggle
