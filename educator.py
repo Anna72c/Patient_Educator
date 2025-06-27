@@ -1,6 +1,6 @@
 # This code is a Streamlit application that generates patient education content using Ollama.
 # It allows healthcare providers to input patient details and receive tailored educational material.
-# It also includes a feature to convert the generated text into audio using gTTS (Google Text-to-Speech).
+# It also includes a feature to convert the generated text into audio using gTTS (Google Text-to-Speech) and the ability to rewrite the response.
 # In addition, it provides examples of responses for different medical conditions and personas.
 
 # ------------------------------------------------------------------------------- Imports and Initialization -------------------------------------------------------------------------------
@@ -12,17 +12,8 @@ import re
 from gtts import gTTS
 from io import BytesIO
 
-# For local testing (use environment variable) OR Streamlit secrets
-client = Groq(api_key=st.secrets["groq_api_key"])  # Use st.secrets for deployment
-
-# Cache the audio generation by text (only re-run if the text changes)
-@st.cache_resource(show_spinner=False)
-def generate_tts_audio(text):
-    tts = gTTS(text)
-    audio_fp = BytesIO()           
-    tts.write_to_fp(audio_fp)
-    audio_fp.seek(0)
-    return audio_fp
+# Connects to Groq API through API key in secrets
+client = Groq(api_key=st.secrets["groq_api_key"])
 
 # Defines the default/initial input values and toggles for the session state
 default_values = {
@@ -36,13 +27,11 @@ default_values = {
     "tts_toggle": False
 }
 
-if "age_touched" not in st.session_state:
-    st.session_state["age_touched"] = False
-
 # Session state initialization for content generation variables
 # Initializes "generation_successful" to False
 if "generation_successful" not in st.session_state:
     st.session_state["generation_successful"] = False
+# Initializes "audio_successful" to False
 if "audio_successful" not in st.session_state:
     st.session_state["audio_successful"] = False  
 # Initializes "content" to an empty string
@@ -66,6 +55,7 @@ def clear_inputs():
             del st.session_state[key]  # Remove instead of assigning
     st.rerun()
 
+# Clears previous generated response and resets status flags
 def clear_response():
     if "generation_successful" in st.session_state:
         del st.session_state["generation_successful"]  # Remove instead of assigning
@@ -92,6 +82,7 @@ def markdown_to_plaintext(markdown_text):
     text = re.sub(r'\n{2,}', '\n', text)
     return text.strip()
 
+# Calls Ollama through Groq to generate a response
 def generate(prompt):
     chat_completion = client.chat.completions.create(
         model="llama3-8b-8192",  # Or "llama3-70b-4096" or the newer "llama-3.3-70b-versatile"
@@ -107,7 +98,7 @@ st.title("Patient Education Generator")
 
 st.write("Please fill in the information below:")
 
-# Creates input fields for patient details and condition selection
+# Input fields for name, age, and condition
 name = st.text_input("Enter the patient’s name:", key="name")
 age = st.text_input("Enter the patient’s age:", key="age")
 condition = st.selectbox(
@@ -117,6 +108,7 @@ condition = st.selectbox(
     key="condition"
 )
 
+# Toggle for including personal details
 personal_toggle = st.checkbox("Toggle personal details", key="personal_toggle")
 
 # If the personal details toggle is on, show additional input fields for interests, life details, and concerns
@@ -125,15 +117,14 @@ if personal_toggle:
     life_detail = st.text_input("Enter a detail of the patient's life (eg. has children, works in an office):", key="life_detail")
     concern = st.text_input("Enter the patient's concern (eg. worried about..., curious about...):", key="concern")
 
+# Toggle for text-to-speech
 tts_toggle = st.checkbox("Toggle text-to-speech", key="tts_toggle")
 
-# Clears all inputs when the button is pressed
+# Button to clear all inputs
 if st.button("Clear Inputs"):
     clear_inputs()
 
-user_prompt = None
-
-# Combines all user inputs into a single prompt
+# Combines all user inputs into a single prompt, with or without personal details
 if personal_toggle:
     # Creates a prompt that includes personal details if the toggle is on
     user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive."
@@ -161,8 +152,9 @@ if st.button("Generate"):
                 st.error(f"An error occurred while generating content: {str(e)}")
                 generation_successful = False
 
+# If generation was successful, display output
 if st.session_state["generation_successful"]:
-    # ------------ makes easier for code
+    # simplifies code
     content = st.session_state["content"]
     # If text-to-speech toggle is on, generate audio and display content, else just display content
     if tts_toggle and not st.session_state["audio_successful"]:
@@ -181,13 +173,15 @@ if st.session_state["generation_successful"]:
     else:
         st.markdown(content)
 
-    # --------------------------ai generated warning
+    # Warns that text is AI generated
     st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
     
-    # ---------------------------clear generated response
+    # Clears generated response
     if st.button("Clear Response"):
         clear_response()
 
+# ------------------------------------------------------------------------------- Rewrite Option -------------------------------------------------------------------------------
+# Once generation is complete, option to rewrite
 if st.session_state["generation_successful"]:
     st.subheader("Want to change the tone or length?")
 
@@ -213,6 +207,7 @@ if st.session_state["generation_successful"]:
             except Exception as e:
                 st.error(f"An error occurred during rewriting: {str(e)}")
 
+    # if rewrite is successful, display rewrite and offer audio option
     if st.session_state["rewrite_successful"]:
         if st.button("Play Audio"):
             with st.spinner("Please wait while audio generates. This may take a minute..."):
@@ -227,16 +222,20 @@ if st.session_state["generation_successful"]:
                 st.audio(sound_file)
         st.markdown(st.session_state["rewritten"])
 
-        # --------------------------ai generated warning
+        # Warns that text is AI generated
         st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
 
 # ------------------------------------------------------------------------------- Response Examples ------------------------------------------------------------------------------------
 
+# Spacing
 st.text("")
+st.text("")
+
 st.subheader("Examples:")
 
 st.markdown("These are sample AI-generated explanations for different patients. They show how the AI can personalize explanations based on age, lifestyle, and health needs.")
 
+# Asthma Example
 with st.expander('**Asthma**'):
     st.markdown("**Prompt:**")
     st.markdown("You are talking to Zoe, a 12 year-old who was diagnosed with Asthma. They are interested in playing the flute. They recently joined their school band and are worried that asthma attacks will stop them from performing. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
@@ -256,6 +255,7 @@ with st.expander('**Asthma**'):
     # Display text
     st.markdown(explanation)
 
+# Diabetes Example
 with st.expander('**Diabetes**'):
     st.markdown("**Prompt:**")
     st.markdown("You are talking to Daniel, a 38 year-old who was diagnosed with Type 2 Diabetes. They are interested in cooking and trying new foods. They were recently told to change their eating habits and feel overwhelmed and unsure what they can eat now. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
@@ -275,6 +275,7 @@ with st.expander('**Diabetes**'):
     # Display text
     st.markdown(explanation)
 
+# High Blood Pressure (Hypertension) Example
 with st.expander('**High Blood Pressure**'):
     st.markdown("**Prompt:**")
     st.markdown("You are talking to Lillian, a 64 year-old who was diagnosed with High Blood Pressure. They are interested in playing with their grandchildren. They take their grandchildren to the park often and are worried that their condition could make them too tired or sick to keep up with them. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
