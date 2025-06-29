@@ -105,7 +105,7 @@ age = st.text_input("Enter the patient’s age:", key="age")
 condition = st.selectbox(
     "Choose a condition:",
     ["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer", "Other"],
-    index=["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer"].index(st.session_state["condition"]),
+    index=["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer", "Other"].index(st.session_state["condition"]),
     key="condition"
 )
 
