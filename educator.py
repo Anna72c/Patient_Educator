@@ -24,7 +24,8 @@ default_values = {
     "life_detail": "",
     "concern": "",
     "personal_toggle": False,
-    "tts_toggle": False
+    "tts_toggle": False,
+    "caregiver_toggle": False
 }
 
 # Session state initialization for content generation variables
@@ -103,10 +104,13 @@ name = st.text_input("Enter the patient’s name:", key="name")
 age = st.text_input("Enter the patient’s age:", key="age")
 condition = st.selectbox(
     "Choose a condition:",
-    ["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer"],
+    ["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer", "Other"],
     index=["Select a condition...", "Influenza", "Eczema", "Depression", "Back Pain", "Breast Cancer"].index(st.session_state["condition"]),
     key="condition"
 )
+
+if condition == "Other":
+    condition = st.text_input("Enter the patient's condition:")
 
 # Toggle for including personal details
 personal_toggle = st.checkbox("Toggle personal details", key="personal_toggle")
