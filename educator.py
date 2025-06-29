@@ -117,6 +117,9 @@ if personal_toggle:
     life_detail = st.text_input("Enter a detail of the patient's life (eg. has children, works in an office):", key="life_detail")
     concern = st.text_input("Enter the patient's concern (eg. worried about..., curious about...):", key="concern")
 
+# Toggle for talking to cargiver instead of patient
+caregiver_toggle = st.checkbox("Toggle caregiver mode", key="caregiver_toggle")
+
 # Toggle for text-to-speech
 tts_toggle = st.checkbox("Toggle text-to-speech", key="tts_toggle")
 
@@ -125,12 +128,18 @@ if st.button("Clear Inputs"):
     clear_inputs()
 
 # Combines all user inputs into a single prompt, with or without personal details
-if personal_toggle:
+if personal_toggle: 
     # Creates a prompt that includes personal details if the toggle is on
-    user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive."
+    if caregiver_toggle:
+        user_prompt = f"You are talking to the caregiver of {name}. {name} is a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
+    else: 
+        user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive."
 else:
     # Creates a prompt without personal details if the toggle is off
-    user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
+    if caregiver_toggle:
+        user_prompt = f"You are talking to the caregiver of {name}. {name} is a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
+    else:
+        user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
 
 # Generates patient education content when button is pressed
 if st.button("Generate"):
