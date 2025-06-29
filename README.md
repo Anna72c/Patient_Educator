@@ -51,6 +51,8 @@ No installation or setup needed — just open the app and try it!
    streamlit run educator.py
 
 ## Project Structure
+- .devcontainer         (VS Code Dev Container)
+  - devcontainer.json
 - example_text          (Example AI explanations)
   - asthma_text.md
   - diabetes_text.md
