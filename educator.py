@@ -86,7 +86,7 @@ def markdown_to_plaintext(markdown_text):
 # Calls Ollama through Groq to generate a response
 def generate(prompt):
     chat_completion = client.chat.completions.create(
-        model="llama3-8b-8192",  # Or "llama3-70b-4096" or the newer "llama-3.3-70b-versatile"
+        model="llama3-8b-8192",
         messages=[
             {"role": "user", "content": prompt}
         ]
@@ -135,13 +135,13 @@ if st.button("Clear Inputs"):
 if personal_toggle: 
     # Creates a prompt that includes personal details if the toggle is on
     if caregiver_toggle:
-        user_prompt = f"You are talking to the caregiver of {name}. {name} is a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
+        user_prompt = f"You are talking to the caregiver of {name}. {name} is a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Give the caregiver instuctions on how to best care for the patient. Use simple language. Be kind and supportive."
     else: 
         user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest}. They {life_detail} and are {concern}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive."
 else:
     # Creates a prompt without personal details if the toggle is off
     if caregiver_toggle:
-        user_prompt = f"You are talking to the caregiver of {name}. {name} is a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
+        user_prompt = f"You are talking to the caregiver of {name}. {name} is a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Give the caregiver instuctions on how to best care for the patient. Use simple language. Be kind and supportive."
     else:
         user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language. Be kind and supportive."
 
