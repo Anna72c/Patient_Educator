@@ -119,7 +119,7 @@ personal_toggle = st.checkbox("Add personal details", key="personal_toggle")
 if personal_toggle:
     interest = st.text_input("Enter one of the patient's interests (eg. sports, gardening, fashion):", key="interest")
     life_detail = st.text_input("Enter a detail of the patient's life (eg. has children, works in an office):", key="life_detail")
-    concern = st.text_input("Enter the patient's concern (eg. worried about..., curious about...):", key="concern")
+    concern = st.text_input("Enter the patient's concern(s) about their condition:", key="concern")
 
 # Toggle for talking to cargiver instead of patient
 caregiver_toggle = st.checkbox("Enable caregiver mode", key="caregiver_toggle")
