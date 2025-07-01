@@ -113,7 +113,7 @@ if condition == "Other":
     condition = st.text_input("Enter the patient's condition:")
 
 # Toggle for including personal details
-personal_toggle = st.checkbox("Toggle personal details", key="personal_toggle")
+personal_toggle = st.checkbox("Add personal details", key="personal_toggle")
 
 # If the personal details toggle is on, show additional input fields for interests, life details, and concerns
 if personal_toggle:
@@ -122,10 +122,10 @@ if personal_toggle:
     concern = st.text_input("Enter the patient's concern (eg. worried about..., curious about...):", key="concern")
 
 # Toggle for talking to cargiver instead of patient
-caregiver_toggle = st.checkbox("Toggle caregiver mode", key="caregiver_toggle")
+caregiver_toggle = st.checkbox("Enable caregiver mode", key="caregiver_toggle")
 
 # Toggle for text-to-speech
-tts_toggle = st.checkbox("Toggle text-to-speech", key="tts_toggle")
+tts_toggle = st.checkbox("Enable text-to-speech", key="tts_toggle")
 
 # Button to clear all inputs
 if st.button("Clear Inputs"):
