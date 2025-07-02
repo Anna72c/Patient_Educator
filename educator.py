@@ -1,7 +1,8 @@
-# This code is a Streamlit application that generates patient education content using Ollama.
-# It allows healthcare providers to input patient details and receive tailored educational material.
-# It also includes a feature to convert the generated text into audio using gTTS (Google Text-to-Speech) and the ability to rewrite the response.
-# In addition, it provides examples of responses for different medical conditions and personas.
+# Patient Education Generator App
+# Created by Anna Hoen
+# This Streamlit app generates personalized patient education content using the LLaMA 3 model via Groq.
+# It supports customization based on patient details, includes a text-to-speech feature (gTTS),
+# and provides example outputs for demonstration.
 
 # ------------------------------------------------------------------------------- Imports and Initialization -------------------------------------------------------------------------------
 
@@ -12,7 +13,7 @@ import re
 from gtts import gTTS
 from io import BytesIO
 
-# Connects to Groq API through API key in secrets
+# Connect to Groq API using a key stored in Streamlit secrets
 client = Groq(api_key=st.secrets["groq_api_key"])
 
 # Defines the default/initial input values and toggles for the session state
@@ -53,17 +54,17 @@ for key, value in default_values.items():
 def clear_inputs():
     for key, value in default_values.items():
         if key in st.session_state:
-            del st.session_state[key]  # Remove instead of assigning
+            del st.session_state[key]  
     st.rerun()
 
 # Clears previous generated response and resets status flags
 def clear_response():
     if "generation_successful" in st.session_state:
-        del st.session_state["generation_successful"]  # Remove instead of assigning
+        del st.session_state["generation_successful"] 
     if "audio_successful" in st.session_state:
-        del st.session_state["audio_successful"]  # Remove instead of assigning
+        del st.session_state["audio_successful"] 
     if "rewrite_successful" in st.session_state:
-        del st.session_state["rewrite_successful"]  # Remove instead of assigning
+        del st.session_state["rewrite_successful"] 
     st.rerun()
 
 # Converts markdown text (text w/ formatting done automatically by Ollama) to plain text
@@ -109,6 +110,7 @@ condition = st.selectbox(
     key="condition"
 )
 
+# If "Other" is selected, allow user to type a condition
 if condition == "Other":
     condition = st.text_input("Enter the patient's condition:")
 
@@ -131,33 +133,28 @@ tts_toggle = st.checkbox("Enable text-to-speech", key="tts_toggle")
 if st.button("Clear Inputs"):
     clear_inputs()
 
-# Combines all user inputs into a single prompt, with or without personal details
+# Construct user prompt based on toggles
 if personal_toggle: 
-    # Creates a prompt that includes personal details if the toggle is on
     if caregiver_toggle:
         user_prompt = f"You are talking to the caregiver of {name}. {name} is a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest.lower()}. Details of the patients life include: {life_detail.lower()}. The patient has expressed the following concern(s): {concern.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Give the caregiver instuctions on how to best care for the patient. Make sure all instructions and advice are age appropriate. Use simple language. Be kind and supportive."
     else: 
         user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. They are interested in {interest.lower()}. Details of the patients life include: {life_detail.lower()}. The patient has expressed the following concern(s): {concern.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Make sure all instructions and advice are age appropriate. Be kind and supportive."
 else:
-    # Creates a prompt without personal details if the toggle is off
     if caregiver_toggle:
         user_prompt = f"You are talking to the caregiver of {name}. {name} is a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Give the caregiver instuctions on how to best care for the patient. Make sure all instructions and advice are age appropriate. Use simple language. Be kind and supportive."
     else:
         user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Make sure all instructions and advice are age appropriate. Use simple language. Be kind and supportive."
 
-# Generates patient education content when button is pressed
+# Generate content if all inputs are valid
 if st.button("Generate"):
-    # Checks for empty fields, invalid conditions, or missing personal details if toggle is on
     if not name or not age:
         st.error("Please fill in all fields.")
     elif condition == "Select a condition...":
         st.error("Please select a condition.")
     elif personal_toggle and (not interest or not life_detail or not concern):
         st.error("Please fill in all personal detail fields or uncheck the box.")
-    # If all inputs are valid, generate content
     else:
         with st.spinner("Please wait while content generates. This may take a minute..."):
-            # In case of an error with Ollama, it will display an error message
             try:
                 st.session_state["content"] = generate(user_prompt)
                 st.session_state["generation_successful"] = True
