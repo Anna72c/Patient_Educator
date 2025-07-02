@@ -28,6 +28,18 @@ Check out the live demo here: [Patient Education Generator](https://anna72c-pati
 
 No installation or setup needed — just open the app and try it!
 
+How to Use:
+
+  1. Enter patient details (name, age, condition)
+
+  2. (Optional) Add personal information or enable caregiver mode
+
+  3. Click "Generate" to receive a tailored explanation
+
+  4. Use "Rewrite" for different tones or formats
+
+  5. Enable text-to-speech to hear the explanation
+
 ## How to Run Locally
 1. Clone the repository:
    ```bash
