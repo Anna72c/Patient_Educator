@@ -145,6 +145,9 @@ else:
     else:
         user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Make sure all instructions and advice are age appropriate. Use simple language. Be kind and supportive."
 
+# Fixes issue where AI gives random unnecessary numbered lists instead of bullet points
+user_prompt = user_prompt + "Don't add unnecessary numbered lists, replace them with bullet pints instead."
+
 # Generate content if all inputs are valid
 if st.button("Generate"):
     if not name or not age:
@@ -248,7 +251,7 @@ st.markdown("These are sample AI-generated explanations for different patients. 
 # Asthma Example
 with st.expander('**Asthma**'):
     st.markdown("**Prompt:**")
-    st.markdown("You are talking to Zoe, a 12 year-old who was diagnosed with Asthma. They are interested in playing the flute. They recently joined their school band and are worried that asthma attacks will stop them from performing. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
+    st.markdown("You are talking to Zoe, a 12-year-old who was diagnosed with asthma. They are interested in playing the flute. Details of the patient's life include: they recently joined their school band. The patient has expressed the following concern(s): they are worried that asthma attacks will stop them from performing. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Make sure all instructions and advice are age appropriate. Be kind and supportive.")
     st.markdown("**Response:**")
     # Path to text file
     text_path = "example_text/asthma_text.md"
@@ -268,7 +271,7 @@ with st.expander('**Asthma**'):
 # Diabetes Example
 with st.expander('**Diabetes**'):
     st.markdown("**Prompt:**")
-    st.markdown("You are talking to Daniel, a 38 year-old who was diagnosed with Type 2 Diabetes. They are interested in cooking and trying new foods. They were recently told to change their eating habits and feel overwhelmed and unsure what they can eat now. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
+    st.markdown("You are talking to Daniel, a 38-year-old who was diagnosed with type 2 diabetes. They are interested in cooking and trying new foods. Details of the patient's life include: they were recently told to change their eating habits. The patient has expressed the following concern(s): they feel overwhelmed and unsure what they can eat now. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Make sure all instructions and advice are age appropriate. Be kind and supportive.")
     st.markdown("**Response:**")
     # Path to text file
     text_path = "example_text/diabetes_text.md"
@@ -288,7 +291,7 @@ with st.expander('**Diabetes**'):
 # High Blood Pressure (Hypertension) Example
 with st.expander('**High Blood Pressure**'):
     st.markdown("**Prompt:**")
-    st.markdown("You are talking to Lillian, a 64 year-old who was diagnosed with High Blood Pressure. They are interested in playing with their grandchildren. They take their grandchildren to the park often and are worried that their condition could make them too tired or sick to keep up with them. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Be kind and supportive.")
+    st.markdown("You are talking to Lillian, a 64-year-old who was diagnosed with high blood pressure. They are interested in playing with their grandchildren. Details of the patient's life include: they take their grandchildren to the park often. The patient has expressed the following concern(s): they are worried that their condition could make them too tired or sick to keep up with them. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Use simple language and include examples relevant to their interests and life details. Make sure all instructions and advice are age appropriate. Be kind and supportive.")
     st.markdown("**Response:**")
     # Path to text file
     text_path = "example_text/hypertension_text.md"
