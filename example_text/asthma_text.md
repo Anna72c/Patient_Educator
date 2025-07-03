@@ -18,18 +18,18 @@ Now, let's talk about treatment options! There are many ways to manage asthma, a
 
 Here are some treatment options that might work for you:
 
-1. Quick-relief inhalers: These inhalers can help relieve symptoms quickly. Your doctor might prescribe a reliever medication called albuterol or levalbuterol. You can use these inhalers before exercise or when you're playing the flute for a long time to help prevent symptoms.
-2. Controller medications: These medications are taken every day to reduce inflammation in the airways and prevent symptoms. Your doctor might prescribe a medication called fluticasone or montelukast.
-3. Peak flow meters: These devices measure how quickly you can breathe out air. This can help you track your progress and monitor your symptoms.
-4. Avoiding triggers: By identifying and avoiding triggers, you can reduce the frequency and severity of asthma attacks. Your doctor might recommend avoiding strong smells, using a HEPA air purifier at home, and taking allergy medication during peak pollen seasons.
+- Quick-relief inhalers: These inhalers can help relieve symptoms quickly. Your doctor might prescribe a reliever medication called albuterol or levalbuterol. You can use these inhalers before exercise or when you're playing the flute for a long time to help prevent symptoms.
+- Controller medications: These medications are taken every day to reduce inflammation in the airways and prevent symptoms. Your doctor might prescribe a medication called fluticasone or montelukast.
+- Peak flow meters: These devices measure how quickly you can breathe out air. This can help you track your progress and monitor your symptoms.
+- Avoiding triggers: By identifying and avoiding triggers, you can reduce the frequency and severity of asthma attacks. Your doctor might recommend avoiding strong smells, using a HEPA air purifier at home, and taking allergy medication during peak pollen seasons.
 
 Finally, here are some tips to help you stay healthy and manage your asthma while playing the flute:
 
-1. Carry your inhaler with you at all times and use it as directed.
-2. Consult with your doctor before starting any new exercise program or playing the flute for long periods.
-3. Monitor your symptoms and track your peak flow readings.
-4. Take your medications as prescribed, and don't skip doses.
-5. Talk to your band director about your asthma and how it might affect your playing. They might have suggestions or accommodations to help you better manage your symptoms.
+- Carry your inhaler with you at all times and use it as directed.
+- Consult with your doctor before starting any new exercise program or playing the flute for long periods.
+- Monitor your symptoms and track your peak flow readings.
+- Take your medications as prescribed, and don't skip doses.
+- Talk to your band director about your asthma and how it might affect your playing. They might have suggestions or accommodations to help you better manage your symptoms.
 
 Zoe, I want you to know that you're not alone! Many people, including children, have asthma and manage it successfully. With the right treatment and precautions, you can enjoy playing the flute without worrying about your asthma. Remember, it's essential to communicate openly with your doctor, band director, and friends about your condition.
 
