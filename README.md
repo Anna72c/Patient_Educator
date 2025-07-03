@@ -74,6 +74,7 @@ How to Use:
   - diabetes_audio.mp3
   - hypertension_audio.mp3
 - README.md             (This file)
+- docs.md               (Full project documentation)
 - educator.py           (Main Streamlit application)
 - requirements.txt      (Required dependencies)
 
