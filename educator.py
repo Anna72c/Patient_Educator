@@ -87,7 +87,7 @@ def markdown_to_plaintext(markdown_text):
 # Calls Ollama through Groq to generate a response
 def generate(prompt):
     chat_completion = client.chat.completions.create(
-        model="llama3-8b",
+        model="llama3-8b-8192",
         messages=[
             {"role": "user", "content": prompt}
         ]
