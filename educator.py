@@ -145,9 +145,6 @@ else:
     else:
         user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Make sure all instructions and advice are age appropriate. Use simple language. Be kind and supportive."
 
-# Fixes issue where AI gives random unnecessary numbered lists instead of bullet points
-user_prompt = user_prompt + "Don't add unnecessary numbered lists, replace them with bullet pints instead."
-
 # Generate content if all inputs are valid
 if st.button("Generate"):
     if not name or not age:
