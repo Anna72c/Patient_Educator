@@ -222,14 +222,14 @@ if st.session_state["generation_successful"]:
         if st.button("Play Audio"):
             with st.spinner("Please wait while audio generates. This may take a minute..."):
                 # creates new temp audio file in memory
-                sound_file = BytesIO()
+                re_sound_file = BytesIO()
                 plain = markdown_to_plaintext(st.session_state["rewritten"])
                 # creates a gTTS object with ollama output as text and english as language
                 tts = gTTS(plain, lang='en')
                 # puts the generated text to temp file
-                tts.write_to_fp(sound_file)
+                tts.write_to_fp(re_sound_file)
                 # streams temp file to streamlit ui for playing
-                st.audio(sound_file)
+                st.audio(re_sound_file)
         st.markdown(st.session_state["rewritten"])
 
         # Warns that text is AI generated
