@@ -237,6 +237,8 @@ if st.session_state["generation_successful"]:
         if "rewrite_sound_file" in st.session_state:
             st.audio(st.session_state["rewrite_sound_file"])
 
+        st.markdown(rewritten)
+
         # Warns that text is AI generated
         st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
 
