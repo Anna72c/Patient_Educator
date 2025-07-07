@@ -224,7 +224,7 @@ if st.session_state["generation_successful"]:
     if st.session_state.get("rewrite_successful"):
         rewritten = st.session_state["rewritten"]
 
-        if st.button("Play Rewritten Audio"):
+        if st.button("Play Audio"):
             if "rewrite_sound_file" not in st.session_state:
                 with st.spinner("Please wait while audio generates. This may take a minute..."):
                     plain = markdown_to_plaintext(rewritten)
