@@ -149,8 +149,9 @@ else:
     else:
         user_prompt = f"You are talking to {name}, a {age} -year-old who was diagnosed with {condition.lower()}. Provide a detailed explanation of their condition, its causes, symptoms, and treatment options. Make sure all instructions and advice are age appropriate. Use simple language. Be kind and supportive."
 
-# Generate content if all inputs are valid
+# Generate button
 if st.button("Generate"):
+    # Validate required fields
     if not name or not age:
         st.error("Please fill in all fields.")
     elif condition == "Select a condition...":
@@ -158,6 +159,7 @@ if st.button("Generate"):
     elif personal_toggle and (not interest or not life_detail or not concern):
         st.error("Please fill in all personal detail fields or uncheck the box.")
     else:
+        # Generate explanation
         with st.spinner("Please wait while content generates. This may take a minute..."):
             try:
                 st.session_state["content"] = generate(user_prompt)
@@ -173,10 +175,12 @@ if st.session_state["generation_successful"]:
     # If text-to-speech toggle is on, generate audio and display content, else just display content
     if tts_toggle and "sound_file" not in st.session_state:
         with st.spinner("Please wait while audio generates. This may take a minute..."):
+            # Convert markdown to plain text for TTS
             plain = markdown_to_plaintext(content)
             tts = gTTS(plain, lang='en')
             sound_file = BytesIO()
             tts.write_to_fp(sound_file)
+            # Rewind to start so Streamlit can play it
             sound_file.seek(0)
             st.session_state["sound_file"] = sound_file
 
@@ -184,9 +188,10 @@ if st.session_state["generation_successful"]:
     if tts_toggle and "sound_file" in st.session_state:
         st.audio(st.session_state["sound_file"])
 
+    # Display the generated explanation
     st.markdown(content)
 
-    # Warns that text is AI generated
+    # Disclaimer
     st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
     
     # Clears generated response
@@ -207,23 +212,28 @@ if st.session_state["generation_successful"]:
     # Rewrite button
     if st.button("Rewrite Explanation"):
         st.session_state["rewrite_successful"] = False
-        st.session_state.pop("rewrite_sound_file", None)  # Reset rewrite audio
+        # Clear old rewrite audio if any
+        st.session_state.pop("rewrite_sound_file", None)
 
+        # Generate rewrite with prompt based on selected style
         with st.spinner("Rewriting explanation..."):
             content = st.session_state["content"]
             if style == "Bullet Points":
                 rewrite_prompt = f"Rewrite the following explanation as clear bullet points:\n\n{content}"
             else:
                 rewrite_prompt = f"Rewrite the following explanation to be {style.lower()}:\n\n{content}"
+            
             try:
                 st.session_state["rewritten"] = generate(rewrite_prompt)
                 st.session_state["rewrite_successful"] = True
             except Exception as e:
                 st.error(f"An error occurred during rewriting: {str(e)}")
 
+    # If rewrite was successful, display text and audio button
     if st.session_state.get("rewrite_successful"):
         rewritten = st.session_state["rewritten"]
 
+        # Play rewritten audio on button click
         if st.button("Play Audio"):
             if "rewrite_sound_file" not in st.session_state:
                 with st.spinner("Please wait while audio generates. This may take a minute..."):
@@ -234,12 +244,14 @@ if st.session_state["generation_successful"]:
                     re_sound_file.seek(0)
                     st.session_state["rewrite_sound_file"] = re_sound_file
 
+        # If rewritten audio exists, play it
         if "rewrite_sound_file" in st.session_state:
             st.audio(st.session_state["rewrite_sound_file"])
 
+        # Display the rewritten explanation
         st.markdown(rewritten)
 
-        # Warns that text is AI generated
+        # Disclaimer
         st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
 
 # ------------------------------------------------------------------------------- Response Examples ------------------------------------------------------------------------------------
