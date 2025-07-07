@@ -184,8 +184,7 @@ if st.session_state["generation_successful"]:
     if tts_toggle and "sound_file" in st.session_state:
         st.audio(st.session_state["sound_file"])
 
-    else:
-        st.markdown(content)
+    st.markdown(content)
 
     # Warns that text is AI generated
     st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
