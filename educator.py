@@ -65,6 +65,10 @@ def clear_response():
         del st.session_state["audio_successful"] 
     if "rewrite_successful" in st.session_state:
         del st.session_state["rewrite_successful"] 
+    if "sound_file" in st.session_state:
+        del st.session_state["sound_file"] 
+    if "rewrite_sound_file" in st.session_state:
+        del st.session_state["rewrite_sound_file"] 
     st.rerun()
 
 # Converts markdown text (text w/ formatting done automatically by Ollama) to plain text
@@ -167,19 +171,19 @@ if st.session_state["generation_successful"]:
     # simplifies code
     content = st.session_state["content"]
     # If text-to-speech toggle is on, generate audio and display content, else just display content
-    if tts_toggle and not st.session_state["audio_successful"]:
+    if tts_toggle and "sound_file" not in st.session_state:
         with st.spinner("Please wait while audio generates. This may take a minute..."):
-            # creates new temp audio file in memory
-            sound_file = BytesIO()
             plain = markdown_to_plaintext(content)
-            # creates a gTTS object with ollama output as text and english as language
             tts = gTTS(plain, lang='en')
-            # puts the generated text to temp file
+            sound_file = BytesIO()
             tts.write_to_fp(sound_file)
-            # streams temp file to streamlit ui for playing
-            st.audio(sound_file)
-            st.session_state["audio_successful"] = True
-            st.markdown(content)
+            sound_file.seek(0)
+            st.session_state["sound_file"] = sound_file
+
+    # Play original audio if available
+    if tts_toggle and "sound_file" in st.session_state:
+        st.audio(st.session_state["sound_file"])
+
     else:
         st.markdown(content)
 
@@ -204,9 +208,10 @@ if st.session_state["generation_successful"]:
     # Rewrite button
     if st.button("Rewrite Explanation"):
         st.session_state["rewrite_successful"] = False
+        st.session_state.pop("rewrite_sound_file", None)  # Reset rewrite audio
 
         with st.spinner("Rewriting explanation..."):
-            # Create a prompt based on selected style
+            content = st.session_state["content"]
             if style == "Bullet Points":
                 rewrite_prompt = f"Rewrite the following explanation as clear bullet points:\n\n{content}"
             else:
@@ -217,20 +222,21 @@ if st.session_state["generation_successful"]:
             except Exception as e:
                 st.error(f"An error occurred during rewriting: {str(e)}")
 
-    # if rewrite is successful, display rewrite and offer audio option
-    if st.session_state["rewrite_successful"]:
-        if st.button("Play Audio"):
-            with st.spinner("Please wait while audio generates. This may take a minute..."):
-                # creates new temp audio file in memory
-                re_sound_file = BytesIO()
-                plain = markdown_to_plaintext(st.session_state["rewritten"])
-                # creates a gTTS object with ollama output as text and english as language
-                tts = gTTS(plain, lang='en')
-                # puts the generated text to temp file
-                tts.write_to_fp(re_sound_file)
-                # streams temp file to streamlit ui for playing
-                st.audio(re_sound_file)
-        st.markdown(st.session_state["rewritten"])
+    if st.session_state.get("rewrite_successful"):
+        rewritten = st.session_state["rewritten"]
+
+        if st.button("Play Rewritten Audio"):
+            if "rewrite_sound_file" not in st.session_state:
+                with st.spinner("Please wait while audio generates. This may take a minute..."):
+                    plain = markdown_to_plaintext(rewritten)
+                    tts = gTTS(plain, lang='en')
+                    re_sound_file = BytesIO()
+                    tts.write_to_fp(re_sound_file)
+                    re_sound_file.seek(0)
+                    st.session_state["rewrite_sound_file"] = re_sound_file
+
+        if "rewrite_sound_file" in st.session_state:
+            st.audio(st.session_state["rewrite_sound_file"])
 
         # Warns that text is AI generated
         st.markdown("*This explanation is AI generated and is not a substitute for medical advice. Please consult a healthcare professional for medical guidance.*")
